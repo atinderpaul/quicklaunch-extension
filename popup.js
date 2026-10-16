@@ -364,12 +364,21 @@ class QuickLaunchSessions {
     return card;
   }
 
+  get fallbackFaviconDataUrl() {
+    // URL-encoded so the value contains no raw quotes/brackets and is safe
+    // to embed inside both an HTML attribute and a single-quoted JS string.
+    const svg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10' fill='#e5e7eb'/></svg>";
+    // encodeURIComponent leaves ' unescaped, so escape it separately to keep
+    // the result safe inside a single-quoted JS string too.
+    return `data:image/svg+xml,${encodeURIComponent(svg).replace(/'/g, '%27')}`;
+  }
+
   renderSessionTabs(session) {
     return session.tabs.map((tab, index) => `
       <div class="session-tab">
         <input type="checkbox" class="tab-checkbox" data-tab-index="${index}">
-        <img class="tab-favicon" src="${tab.favIconUrl || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="%23e5e7eb"/></svg>'}" 
-             onerror="this.src='data:image/svg+xml,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 24 24&quot;><circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;10&quot; fill=&quot;%23e5e7eb&quot;/></svg>'" 
+        <img class="tab-favicon" src="${tab.favIconUrl ? this.escapeHtml(tab.favIconUrl) : this.fallbackFaviconDataUrl}"
+             onerror="this.onerror=null;this.src='${this.fallbackFaviconDataUrl}'"
              alt="">
         <a href="#" class="tab-title" data-url="${this.escapeHtml(tab.url)}">${this.escapeHtml(tab.title)}</a>
         <button class="remove-tab" data-session-id="${session.id}" data-tab-index="${index}">×</button>
