@@ -23,9 +23,5 @@
     "16": "icons/icon16.jpg",
     "48": "icons/icon48.jpg",
     "128": "icons/icon128.jpg"
-  },
-  
-  "host_permissions": [
-    "<all_urls>"
-  ]
+  }
 }
